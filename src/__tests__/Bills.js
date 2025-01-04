@@ -36,5 +36,26 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+    test("When I click on the New Bill button, handleClickNewBill should navigate to NewBill page", () => {
+      document.body.innerHTML = BillsUI({ data: bills });
+      const onNavigate = jest.fn();
+
+      const billsPage = {
+        onNavigate: onNavigate,
+        handleClickNewBill: jest.fn(function () {
+          this.onNavigate(ROUTES_PATH['NewBill']);
+        })
+      };
+
+      const newBillButton = screen.getByTestId('btn-new-bill');
+      expect(newBillButton).toBeInTheDocument();
+
+      newBillButton.addEventListener('click', billsPage.handleClickNewBill.bind(billsPage));
+
+      newBillButton.click();
+
+      expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill']);
+    });
+
   })
 })
