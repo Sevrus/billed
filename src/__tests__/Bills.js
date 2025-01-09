@@ -10,9 +10,14 @@ import {localStorageMock} from "../__mocks__/localStorage.js";
 import '@testing-library/jest-dom';
 
 import router from "../app/Router.js";
+import Bills from "../containers/Bills.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
+    beforeEach(() => {
+      document.body.innerHTML = BillsUI({ data: bills });
+    });
+
     test("Then bill icon in vertical layout should be highlighted", async () => {
 
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -30,22 +35,15 @@ describe("Given I am connected as an employee", () => {
       expect(windowIcon).toHaveClass('active-icon');
     })
     test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
     test("When I click on the New Bill button, handleClickNewBill should navigate to NewBill page", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
       const onNavigate = jest.fn();
 
-      const billsPage = {
-        onNavigate: onNavigate,
-        handleClickNewBill: jest.fn(function () {
-          this.onNavigate(ROUTES_PATH['NewBill']);
-        })
-      };
+      const billsPage = new Bills({ document, onNavigate });
 
       const newBillButton = screen.getByTestId('btn-new-bill');
       expect(newBillButton).toBeInTheDocument();
