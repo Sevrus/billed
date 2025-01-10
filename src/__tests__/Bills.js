@@ -4,8 +4,8 @@
 
 import {screen, waitFor} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
-import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
+import {bills} from "../fixtures/bills.js"
+import {ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import '@testing-library/jest-dom';
 
@@ -54,6 +54,27 @@ describe("Given I am connected as an employee", () => {
 
       expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill']);
     });
+    test("When handleClickIconEye is called, it should display with the correct image", () => {
+      const modalMock = jest.fn();
+      $.prototype.modal = modalMock;
 
+      const iconEyeElement = document.createElement("div");
+      iconEyeElement.setAttribute("data-testID", "icon-eye");
+      iconEyeElement.setAttribute("data-bill-url", "https://example.com/bill.pdf");
+      document.body.append(iconEyeElement);
+
+      const billInstance = new Bills({ document, onNavigate: jest.fn() });
+
+      billInstance.handleClickIconEye(iconEyeElement);
+
+      const modalBody = document.querySelector(".modal-body");
+      const imageElement = modalBody.querySelector("img");
+
+      expect(imageElement).toBeTruthy();
+      expect(imageElement.getAttribute("src")).toBe("https://example.com/bill.pdf");
+      expect(imageElement.getAttribute("alt")).toBe("Bill");
+
+      expect(modalMock).toHaveBeenCalledWith("show");
+    })
   })
 })
