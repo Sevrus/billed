@@ -11,6 +11,7 @@ import '@testing-library/jest-dom';
 
 import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
+import {formatDate} from "../app/format.js";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -42,14 +43,9 @@ describe("Given I am connected as an employee", () => {
     })
     test("When I click on the New Bill button, handleClickNewBill should navigate to NewBill page", () => {
       const onNavigate = jest.fn();
-
-      const billsPage = new Bills({ document, onNavigate });
+      const bills = new Bills({ document, onNavigate });
 
       const newBillButton = screen.getByTestId('btn-new-bill');
-      expect(newBillButton).toBeInTheDocument();
-
-      newBillButton.addEventListener('click', billsPage.handleClickNewBill.bind(billsPage));
-
       newBillButton.click();
 
       expect(onNavigate).toHaveBeenCalledWith(ROUTES_PATH['NewBill']);
@@ -75,6 +71,53 @@ describe("Given I am connected as an employee", () => {
       expect(imageElement.getAttribute("alt")).toBe("Bill");
 
       expect(modalMock).toHaveBeenCalledWith("show");
-    })
+    });
   })
+  test("When getBills is called, it should return sorted and formatted bills", async () => {
+    const storeMock = {
+      bills: jest.fn(() => ({
+        list: jest.fn(() =>
+            Promise.resolve([
+              { date: "2022-01-01", status: "accepted" },
+              { date: "2023-01-01", status: "pending" },
+            ])
+        ),
+      })),
+    };
+
+    const bills = new Bills({ document, onNavigate: jest.fn(), store: storeMock });
+    const result = await bills.getBills();
+
+    expect(result).toEqual([
+      expect.objectContaining({ date: "1 Jan. 23", status: "En attente", rawDate: "2023-01-01" }),
+      expect.objectContaining({ date: "1 Jan. 22", status: "Accepté", rawDate: "2022-01-01" })
+    ]);
+
+    expect(storeMock.bills).toHaveBeenCalled();
+  });
+  test("formatDate should correctly format a date", () => {
+    const formattedDate = formatDate("2023-01-01");
+    expect(formattedDate).toBe("1 Jan. 23");
+
+    const formattedDate2 = formatDate("2022-01-01");
+    expect(formattedDate2).toBe("1 Jan. 22");
+  });
+  test("When getBills is called with corrupted data, it should return unformatted date", async () => {
+    const storeMock = {
+      bills: jest.fn(() => ({
+        list: jest.fn(() =>
+            Promise.resolve([
+              { date: "invalid-date", status: "accepted" },
+            ])
+        ),
+      })),
+    };
+
+    const bills = new Bills({ document, onNavigate: jest.fn(), store: storeMock });
+    const result = await bills.getBills();
+
+    expect(result).toEqual([
+      expect.objectContaining({ date: "invalid-date", rawDate: "invalid-date" }),
+    ]);
+  });
 })
