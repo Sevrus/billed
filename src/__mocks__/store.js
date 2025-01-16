@@ -63,6 +63,12 @@ const mockedBills = {
             }])
 
     },
+    listEmpty() {
+        return Promise.resolve([]);
+    },
+    listFail() {
+        return Promise.reject(new Error('Erreur serveur'))
+    },
     create(bill) {
         return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'})
     },
@@ -88,7 +94,6 @@ const mockedBills = {
 export default {
     bills() {
         return mockedBills
-        //return {}
-    },
+    }
 }
 
