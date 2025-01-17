@@ -1,3 +1,28 @@
+// Mocks persistants pour create et update
+export const createMock = jest.fn((bill) =>
+    Promise.resolve({
+        fileUrl: `https://localhost:3456/images/${bill.fileName || 'test.jpg'}`, // File URL simulé dynamiquement
+        key: bill && bill.name ? `${bill.name}-${Date.now()}` : '1234'        // Clé unique simulée
+    })
+);
+export const updateMock = jest.fn((bill) =>
+    Promise.resolve({
+        id: bill?.id || "47qAXb6fIm2zOKkLzMro",
+        vat: bill?.vat || "80",
+        fileUrl: bill?.fileUrl || "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        status: bill?.status || "pending",
+        type: bill?.type || "Hôtel et logement",
+        commentary: bill?.commentary || "séminaire billed",
+        name: bill?.name || "encore",
+        fileName: bill?.fileName || "preview-facture-free-201801-pdf-1.jpg",
+        date: bill?.date || "2004-04-04",
+        amount: bill?.amount || 400,
+        commentAdmin: bill?.commentAdmin || "ok",
+        email: bill?.email || "a@a",
+        pct: bill?.pct || 20
+    })
+);
+
 const mockedBills = {
     list() {
         return Promise.resolve([
@@ -69,26 +94,8 @@ const mockedBills = {
     listFail() {
         return Promise.reject(new Error('Erreur serveur'))
     },
-    create(bill) {
-        return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'})
-    },
-    update(bill) {
-        return Promise.resolve({
-            "id": "47qAXb6fIm2zOKkLzMro",
-            "vat": "80",
-            "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-            "status": "pending",
-            "type": "Hôtel et logement",
-            "commentary": "séminaire billed",
-            "name": "encore",
-            "fileName": "preview-facture-free-201801-pdf-1.jpg",
-            "date": "2004-04-04",
-            "amount": 400,
-            "commentAdmin": "ok",
-            "email": "a@a",
-            "pct": 20
-        })
-    },
+    create: createMock, // Utilise createMock pour pouvoir tracer et personnaliser
+    update: updateMock // Idem pour updateMock
 }
 
 export default {
