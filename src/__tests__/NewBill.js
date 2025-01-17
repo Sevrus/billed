@@ -44,6 +44,7 @@ describe("Given I am connected as an employee", () => {
             expect(form).toBeTruthy(); // Vérifie que le formulaire est présent
         });
         test("Then it should initialize with default values", () => {
+            //Vérifie que l'objet newBill est correctement initialisé
             expect(newBill.fileUrl).toBeNull();
             expect(newBill.fileName).toBeNull();
             expect(newBill.billId).toBeNull();
