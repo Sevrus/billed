@@ -7,6 +7,8 @@ import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import mockStore, {mockBillFormInputs} from "../__mocks__/store";
 import {ROUTES, ROUTES_PATH} from "../constants/routes.js";
+import {localStorageMock} from "../__mocks__/localStorage.js";
+import router from "../app/Router.js";
 
 jest.mock("../app/store", () => {
     return {
@@ -19,6 +21,30 @@ jest.mock("../app/store", () => {
 
 
 describe("Given I am connected as an employee", () => {
+    describe("When I navigate to NewBill page", () => {
+        test("Then mail icon in vertical layout should be highlighted", async () => {
+            // Simule un utilisateur connecté
+            Object.defineProperty(window, 'localStorage', {value: localStorageMock});
+            window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }));
+
+            // Initialise le DOM et configure le routeur
+            const root = document.createElement("div");
+            root.setAttribute("id", "root");
+            document.body.append(root);
+
+            router(); // Charge les routes
+            window.onNavigate(ROUTES_PATH.NewBill); // Simule la navigation vers NewBill
+
+            // Attendez que l'icône soit disponible
+            await waitFor(() => screen.getByTestId('icon-mail'));
+
+            const mailIcon = screen.getByTestId('icon-mail');
+
+            // Vérifie que l'icône de mail est active
+            expect(mailIcon.classList).toContain('active-icon');
+        });
+
+    })
     describe("When I am on NewBill Page", () => {
         let newBill;
 
@@ -30,7 +56,6 @@ describe("Given I am connected as an employee", () => {
             document.body.innerHTML = NewBillUI();
 
             // Mock de `onNavigate`
-            // const onNavigate = jest.fn();
             const onNavigate = (pathname) => {
                 document.body.innerHTML = ROUTES({pathname});
             }
