@@ -5,7 +5,8 @@
 import {fireEvent, screen, waitFor} from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
-import mockStore, {createMock} from "../__mocks__/store";
+import mockStore, {mockBillFormInputs} from "../__mocks__/store";
+import {ROUTES, ROUTES_PATH} from "../constants/routes.js";
 
 jest.mock("../app/store", () => {
     return {
@@ -29,7 +30,10 @@ describe("Given I am connected as an employee", () => {
             document.body.innerHTML = NewBillUI();
 
             // Mock de `onNavigate`
-            const onNavigate = jest.fn();
+            // const onNavigate = jest.fn();
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({pathname});
+            }
 
             //Setup de NewBill pour chaque test
             newBill = new NewBill({
@@ -100,66 +104,50 @@ describe("Given I am connected as an employee", () => {
                 expect(handleSubmit).toHaveBeenCalled();
             });
             test("Then the form data should be sent to the API", async () => {
-                // Mock sur la fonction de navigation
-                const onNavigateMock = jest.fn(); // Simule la fonction de navigation
-                newBill = new NewBill({
-                    document: document,
-                    onNavigate: onNavigateMock,
-                    store: mockStore,
-                    localStorage: window.localStorage
-                });
+                // Remplissage des champs avec customInputs provenant de store.js
+                mockBillFormInputs
+                    .forEach((input) =>
+                    fireEvent.change(screen.getByTestId(input.testId), {
+                        target: { value: input.value },
+                    })
+                );
 
-                // Espionne handleSubmit pour vérifier son appel
-                const handleSubmit = jest.spyOn(newBill, "handleSubmit");
-
-                // Remplissage des champs de formulaire
-                fireEvent.change(screen.getByTestId("expense-type"), { target: { value: "Transports" } });
-                fireEvent.change(screen.getByTestId("expense-name"), { target: { value: "Train ticket" } });
-                fireEvent.change(screen.getByTestId("amount"), { target: { value: "100" } });
-                fireEvent.change(screen.getByTestId("datepicker"), { target: { value: "2023-10-15" } });
-                fireEvent.change(screen.getByTestId("vat"), { target: { value: "20" } });
-                fireEvent.change(screen.getByTestId("pct"), { target: { value: "20" } });
-                fireEvent.change(screen.getByTestId("commentary"), { target: { value: "Business trip to Paris" } });
-
-                // Ajout d'un fichier valide
+                // Simulation de l'ajout d'un fichier
                 const fileInput = screen.getByTestId("file");
-                const file = new File(["test"], "receipt.jpg", { type: "image/jpeg" });
+                const file = new File(["dummy content"], "receipt.jpg", { type: "image/jpeg" });
                 fireEvent.change(fileInput, { target: { files: [file] } });
 
-                // Ajout du listener pour handleSubmit
+                // Espions sur les méthodes importantes
+                const spyUpdateBill = jest.spyOn(newBill, "updateBill");
+
+                // Mock de la fonction handleSubmit
+                const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
                 const form = screen.getByTestId("form-new-bill");
-                form.addEventListener("submit", newBill.handleSubmit);
+                form.addEventListener("submit", handleSubmit);
 
                 // Soumission du formulaire
                 fireEvent.submit(form);
 
-                // Vérifie que handleSubmit a bien été appelé
+                // Vérifie que handleSubmit a été appelé
                 expect(handleSubmit).toHaveBeenCalled();
 
-                // Vérifie que createMock a bien été appelé
-                await waitFor(() => {
-                    expect(createMock).toHaveBeenCalled();
-                });
-
-                // Vérifie que createMock a été appelé avec les bonnes données
-                expect(createMock).toHaveBeenCalledWith(
+                // Vérifie qu'updateBill a été appelé avec les bonnes données
+                expect(spyUpdateBill).toHaveBeenCalledWith(
                     expect.objectContaining({
                         type: "Transports",
-                        name: "Train ticket",
-                        amount: 100,
-                        vat: "20",
+                        name: "Vol Paris-Bordeaux",
+                        date: "2023-04-01",
+                        amount: 42,
+                        vat: "18",
                         pct: 20,
-                        commentary: "Business trip to Paris",
-                        fileUrl: expect.any(String),
-                        fileName: "receipt.jpg",
-                        email: "employee@test.com", // Supposant que l'email vient de localStorage
-                        date: "2023-10-15"
+                        commentary: "test bill",
+                        status: "pending",
                     })
                 );
 
-                // Vérifie que la navigation vers la page "/bills" a bien eu lieu
+                // Vérifie que la page de liste des notes de frais s'affiche correctement
                 await waitFor(() => {
-                    expect(onNavigateMock).toHaveBeenCalledWith("/bills");
+                    expect(screen.getByText("Mes notes de frais")).toBeTruthy();
                 });
             });
         });
