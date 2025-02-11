@@ -35,7 +35,7 @@ describe("Given I am connected as an employee", () => {
             router(); // Charge les routes
             window.onNavigate(ROUTES_PATH.NewBill); // Simule la navigation vers NewBill
 
-            // Attendez que l'icône soit disponible
+            // Attendre que l'icône soit disponible
             await waitFor(() => screen.getByTestId("icon-mail"));
 
             const mailIcon = screen.getByTestId("icon-mail");
@@ -55,7 +55,7 @@ describe("Given I am connected as an employee", () => {
             // Initialisation du DOM pour la page NewBill
             document.body.innerHTML = NewBillUI();
 
-            // Mock de `onNavigate`
+            // Mock de onNavigate
             const onNavigate = (pathname) => {
                 document.body.innerHTML = ROUTES({pathname});
             }
@@ -134,62 +134,6 @@ describe("Given I am connected as an employee", () => {
                 expect(handleChangeFileSpy).toHaveBeenCalled();
                 expect(fileInput.files[0].name).toStrictEqual("test.png");
             });
-            // test("Then store.bills().create should be called with the correct formData", async () => {
-            //     // Mock la méthode create
-            //     const createSpy = jest.spyOn(mockStore.bills(), "create");
-            //
-            //     // Simule le champ fichier
-            //     const fileInput = screen.getByTestId("file");
-            //     const validFile = new File(["dummy content"], "test.jpg", { type: "image/jpeg" });
-            //
-            //     // Simule l'ajout d'un fichier au champ
-            //     fireEvent.change(fileInput, { target: { files: [validFile] } });
-            //
-            //     // Vérifie si le fichier est correctement chargé
-            //     expect(fileInput.files[0].name).toBe("test.jpg");
-            //     expect(fileInput.files[0]).toEqual(validFile);
-            //     expect(fileInput.files).toHaveLength(1);
-            //
-            //     // Attendre et vérifier si la méthode mock store.bills().create est appelée
-            //     await waitFor(() => {
-            //         expect(createSpy).toHaveBeenCalled(); // La méthode create a bien été appelée
-            //         const formData = createSpy.mock.calls[0][0].data;
-            //
-            //         // Vérifie le contenu de formData
-            //         expect(formData.get("file")).toEqual(validFile);
-            //         expect(formData.get("email")).toBe("employee@test.com");
-            //     });
-            // });
-            // test("Then it should set this.fileUrl and this.billId when file is successfully uploaded", async () => {
-            //     mockStore.bills = jest.fn(() => ({
-            //         create: jest.fn(() =>
-            //             Promise.resolve({fileUrl: "mockFileUrl", key: "mockKey"})
-            //         ),
-            //     }));
-            //
-            //     const fileInput = screen.getByTestId("file");
-            //     const file = new File(["dummy content"], "test.jpg", {type: "image/jpeg"});
-            //     fireEvent.change(fileInput, {target: {files: [file]}});
-            //
-            //     await waitFor(() => {
-            //         expect(newBill.fileUrl).toEqual("mockFileUrl");
-            //         expect(newBill.billId).toEqual("mockKey");
-            //     });
-            // });
-            // test("Then it should log an error when store.bills().create fails", async () => {
-            //     mockStore.bills = jest.fn(() => ({
-            //         create: jest.fn(() => Promise.reject(new Error("Erreur serveur"))),
-            //     }));
-            //     const errorSpy = jest.spyOn(console, "error");
-            //
-            //     const fileInput = screen.getByTestId("file");
-            //     const file = new File(["dummy content"], "test.jpg", { type: "image/jpeg" });
-            //     fireEvent.change(fileInput, { target: { files: [file] } });
-            //
-            //     await waitFor(() => {
-            //         expect(errorSpy).toHaveBeenCalledWith(new Error("Erreur serveur"));
-            //     });
-            // });
         });
 
         describe("When I submit a valid form", () => {

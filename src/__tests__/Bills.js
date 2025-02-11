@@ -14,17 +14,15 @@ import router from "../app/Router.js";
 import Bills from "../containers/Bills.js";
 import {formatDate} from "../app/format.js";
 
-jest.mock("../app/store", () => mockStore); // Mock de votre fichier store
+jest.mock("../app/store", () => mockStore); // Mock du fichier store
 
 describe("Given I am connected as an employee", () => {
     afterEach(() => {
         document.body.innerHTML = "";
-        jest.clearAllMocks(); // Réinitialise les mocks individuels comme `jest.spyOn`
-        jest.restoreAllMocks(); // Réinitialise les spies comme les `jest.spyOn`
+        jest.clearAllMocks(); // Réinitialise les mocks individuels comme jest.spyOn
+        jest.restoreAllMocks(); // Réinitialise les spies comme les jest.spyOn
         jest.resetAllMocks(); // Réinitialise tous les mocks du module
     });
-
-    // Object.defineProperty(window, "localStorage", {value: localStorageMock}); // Mock localStorage
 
     describe("When I am on Bills Page", () => {
         beforeEach(() => {

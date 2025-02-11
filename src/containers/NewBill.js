@@ -15,46 +15,7 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
-  // handleChangeFile = e => {
-  //   e.preventDefault()
-  //   console.log("handleChangeFile called with event:", e);
-  //
-  //   const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-  //   console.log("File from input:", file);
-  //   const filePath = e.target.value.split(/\\/g)
-  //   const fileName = filePath[filePath.length-1]
-  //   console.log("Extracted fileName:", fileName);
-  //   console.log("e.target.value:", e.target.value);
-  //
-  //   const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
-  //   if(!allowedExtensions.test(fileName)) {
-  //     e.target.value = "";
-  //     console.log("Invalid file type");
-  //     return;
-  //   }
-  //
-  //   const formData = new FormData()
-  //   const email = JSON.parse(localStorage.getItem("user")).email
-  //   formData.append('file', file)
-  //   formData.append('email', email)
-  //   console.log("FormData prepared:", formData);
-  //
-  //   this.store
-  //     .bills()
-  //     .create({
-  //       data: formData,
-  //       headers: {
-  //         noContentType: true
-  //       }
-  //     })
-  //     .then(({fileUrl, key}) => {
-  //       console.log("File uploaded successfully. URL:", fileUrl, "Key:", key);
-  //       console.log(fileUrl)
-  //       this.billId = key
-  //       this.fileUrl = fileUrl
-  //       this.fileName = fileName
-  //     }).catch(error => console.error(error))
-  // }
+
   handleChangeFile = e => {
     e.preventDefault();
     console.log("handleChangeFile called with event:", e);
